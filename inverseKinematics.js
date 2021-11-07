@@ -12,7 +12,7 @@ function distance(firstPoint, secondPoint) {
   const yDif = Math.abs(secondPoint.y - firstPoint.y);
   const zDif = Math.abs(secondPoint.z - firstPoint.z);
 
-  const dist = Math.sqrt(xDif * xDif + yDif * yDif + zDif * zDif);
+  const dist = Math.hypot(xDif, yDif, zDif);
 
   return dist;
 }
@@ -41,17 +41,16 @@ function targetReachable(points, goalPos) {
 }
 
 function findMagnitude(vector) {
-  const xSqrd = vector.x * vector.x;
-  const ySqrd = vector.y * vector.y;
-  const zSqrd = vector.z * vector.z;
 
-  const mag = Math.sqrt(xSqrd + ySqrd + zSqrd);
+  const mag = Math.hypot(vector.x, vector.y, vector.z);
 
   return mag;
 }
 
 function normalize(vector) {
   const mag = findMagnitude(vector);
+  if (mag == 0)
+  	return {x:0, y:0, z:0};
 
   const normX = vector.x / mag;
   const normY = vector.y / mag;
