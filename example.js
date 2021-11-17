@@ -115,38 +115,28 @@ function testFabrik() {
 
     const intermediateGoalPos = { x: xVal, y: yVal, z: zVal };
 
-    points = fabrik(points, intermediateGoalPos, 1);
+    points = fabrik(points, intermediateGoalPos, points.length);
 
-    point0.geometry.vertices[0].x = points[0].x;
-    point0.geometry.vertices[0].y = points[0].y;
-    point0.geometry.vertices[0].z = points[0].z;
-    point0.geometry.verticesNeedUpdate = true;
+    let g0 =[point0, point1, point2];
+    let l0=[line0, line1];
+    for (let i=0; i<g0.length; i++)
+    {
+      g0[i].geometry.vertices[0].x = points[i].x;
+      g0[i].geometry.vertices[0].y = points[i].y;
+      g0[i].geometry.vertices[0].z = points[i].z;
+      g0[i].geometry.verticesNeedUpdate = true;
 
-    point1.geometry.vertices[0].x = points[1].x;
-    point1.geometry.vertices[0].y = points[1].y;
-    point1.geometry.vertices[0].z = points[1].z;
-    point1.geometry.verticesNeedUpdate = true;
-
-    point2.geometry.vertices[0].x = points[2].x;
-    point2.geometry.vertices[0].y = points[2].y;
-    point2.geometry.vertices[0].z = points[2].z;
-    point2.geometry.verticesNeedUpdate = true;
-
-    line0.geometry.vertices[0].x = points[0].x;
-    line0.geometry.vertices[0].y = points[0].y;
-    line0.geometry.vertices[0].z = points[0].z;
-    line0.geometry.vertices[1].x = points[1].x;
-    line0.geometry.vertices[1].y = points[1].y;
-    line0.geometry.vertices[1].z = points[1].z;
-    line0.geometry.verticesNeedUpdate = true;
-
-    line1.geometry.vertices[0].x = points[1].x;
-    line1.geometry.vertices[0].y = points[1].y;
-    line1.geometry.vertices[0].z = points[1].z;
-    line1.geometry.vertices[1].x = points[2].x;
-    line1.geometry.vertices[1].y = points[2].y;
-    line1.geometry.vertices[1].z = points[2].z;
-    line1.geometry.verticesNeedUpdate = true;
+      if (i>0)
+      {
+          l0[i-1].geometry.vertices[0].x = points[i-1].x;
+          l0[i-1].geometry.vertices[0].y = points[i-1].y;
+          l0[i-1].geometry.vertices[0].z = points[i-1].z;
+          l0[i-1].geometry.vertices[1].x = points[i].x;
+          l0[i-1].geometry.vertices[1].y = points[i].y;
+          l0[i-1].geometry.vertices[1].z = points[i].z;
+          l0[i-1].geometry.verticesNeedUpdate = true;
+      }
+    }
 
     if (xMove.reached && yMove.reached && zMove.reached) {
       currentPosition = (currentPosition + 1) % 2;
