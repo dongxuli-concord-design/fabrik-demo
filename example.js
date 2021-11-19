@@ -59,6 +59,28 @@ function createLines(points)
   return lines;
 }
 
+function displayPoints(scenePoints, lines, points)
+{
+      for (let i=0; i<scenePoints.length; i++)
+      {
+        scenePoints[i].geometry.vertices[0].x = points[i].x;
+        scenePoints[i].geometry.vertices[0].y = points[i].y;
+        scenePoints[i].geometry.vertices[0].z = points[i].z;
+        scenePoints[i].geometry.verticesNeedUpdate = true;
+
+        if (i>0)
+        {
+            lines[i-1].geometry.vertices[0].x = points[i-1].x;
+            lines[i-1].geometry.vertices[0].y = points[i-1].y;
+            lines[i-1].geometry.vertices[0].z = points[i-1].z;
+            lines[i-1].geometry.vertices[1].x = points[i].x;
+            lines[i-1].geometry.vertices[1].y = points[i].y;
+            lines[i-1].geometry.vertices[1].z = points[i].z;
+            lines[i-1].geometry.verticesNeedUpdate = true;
+        }
+      }
+}
+
 function testFabrik() {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -123,24 +145,7 @@ function testFabrik() {
 
     points = fabrik(points, intermediateGoalPos, points.length);
 
-    for (let i=0; i<scenePoints.length; i++)
-    {
-      scenePoints[i].geometry.vertices[0].x = points[i].x;
-      scenePoints[i].geometry.vertices[0].y = points[i].y;
-      scenePoints[i].geometry.vertices[0].z = points[i].z;
-      scenePoints[i].geometry.verticesNeedUpdate = true;
-
-      if (i>0)
-      {
-          lines[i-1].geometry.vertices[0].x = points[i-1].x;
-          lines[i-1].geometry.vertices[0].y = points[i-1].y;
-          lines[i-1].geometry.vertices[0].z = points[i-1].z;
-          lines[i-1].geometry.vertices[1].x = points[i].x;
-          lines[i-1].geometry.vertices[1].y = points[i].y;
-          lines[i-1].geometry.vertices[1].z = points[i].z;
-          lines[i-1].geometry.verticesNeedUpdate = true;
-      }
-    }
+    displayPoints(scenePoints, lines, points);
 
     if (xMove.reached && yMove.reached && zMove.reached) {
       currentPosition = (currentPosition + 1) % 2;
