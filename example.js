@@ -7,6 +7,58 @@ manipulation making projects with threejs and beyond.
 This file is a little test that depicts a simple two segment arm moving between
 two goal points.
 *******************************************************************************/
+function disableFrustCull(child)
+{
+  child.traverse((childObj) => {
+    childObj.frustumCulled = false;
+  });
+}
+
+function mapPoints(segments)
+{
+  let point0={x:0, y:0, z:0};
+  let points=[point0];
+  for(let i=0; i<segments.length; i++)
+  {
+    let prev = points[points.length - 1];
+    let point1 = {x:prev.x, y:prev.y+segments[i], z:prev.z};
+    points.splice(points.length, 0, point1);
+  }
+  return points;
+}
+
+function createScenePoints(points)
+{
+  let scenePoints=[];
+  for(let i=0; i<points.length; i++)
+  {
+    let p=points[i];
+    let scenePoint=createPoint({x:p.x, y:p.y, z:p.z, size:3});
+    disableFrustCull(scenePoint);
+    scenePoints.splice(scenePoints.length, 0, scenePoint);
+  }
+  return scenePoints;
+}
+
+function createLines(points)
+{
+  let lines=[];
+  for (let i=1; i<points.length; i++)
+  {
+    let line = createLine({
+      x0: points[i-1].x,
+      y0: points[i-1].y,
+      z0: points[i-1].z,
+      x1: points[i].x,
+      y1: points[i].y,
+      z1: points[i].z,
+    });
+    disableFrustCull(line);
+    lines.splice(lines.length, 0, line);
+  }
+  return lines;
+}
+
 function testFabrik() {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -20,67 +72,21 @@ function testFabrik() {
     renderer.render(scene, camera);
   }
 
-  const point0 = createPoint({ x: 0, y: 0, z: 0, size: 3});
-  const point1 = createPoint({ x: 0, y: 1, z: 0, size: 3});
-  const point2 = createPoint({ x: 0, y: 2, z: 0, size: 3});
-
-  point0.traverse((childObj) => {
-    childObj.frustumCulled = false;
-  });
-
-  scene.add(point0);
-
-  point1.traverse((childObj) => {
-    childObj.frustumCulled = false;
-  });
-
-  scene.add(point1);
-
-  point2.traverse((childObj) => {
-    childObj.frustumCulled = false;
-  });
-
-  scene.add(point2);
-
-  let points = [
-    { x: 0, y: 0, z: 0 },
-    { x: 0, y: 1, z: 0 },
-    { x: 0, y: 2, z: 0 }
-  ];
+  const segments =[1, 1];
+  let points=mapPoints(segments);
+  let scenePoints=createScenePoints(points);
+  for (let i=0; i<scenePoints.length; i++)
+  {
+    scene.add(scenePoints[i]);
+  }
 
   console.log(points[0].x, points[0].y, points[0].z, points[1].x, points[1].y, points[1].z);
 
-  const line0 = createLine({
-    x0: points[0].x,
-    y0: points[0].y,
-    z0: points[0].z,
-    x1: points[1].x,
-    y1: points[1].y,
-    z1: points[1].z,
-  });
-
-  const line1 = createLine({
-    x0: points[1].x,
-    y0: points[1].y,
-    z0: points[1].z,
-    x1: points[2].x,
-    y1: points[2].y,
-    z1: points[2].z,
-  });
-
-  line0.traverse((childObj) => {
-    childObj.frustumCulled = false;
-  });
-
-  console.log(line0);
-
-  scene.add(line0);
-
-  line1.traverse((childObj) => {
-    childObj.frustumCulled = false;
-  });
-
-  scene.add(line1);
+  const lines = createLines(points);
+  for (let i=0; i<lines.length; i++)
+  {
+    scene.add(lines[i]);
+  }
 
   document.body.appendChild(renderer.domElement);
 
@@ -117,24 +123,22 @@ function testFabrik() {
 
     points = fabrik(points, intermediateGoalPos, points.length);
 
-    let g0 =[point0, point1, point2];
-    let l0=[line0, line1];
-    for (let i=0; i<g0.length; i++)
+    for (let i=0; i<scenePoints.length; i++)
     {
-      g0[i].geometry.vertices[0].x = points[i].x;
-      g0[i].geometry.vertices[0].y = points[i].y;
-      g0[i].geometry.vertices[0].z = points[i].z;
-      g0[i].geometry.verticesNeedUpdate = true;
+      scenePoints[i].geometry.vertices[0].x = points[i].x;
+      scenePoints[i].geometry.vertices[0].y = points[i].y;
+      scenePoints[i].geometry.vertices[0].z = points[i].z;
+      scenePoints[i].geometry.verticesNeedUpdate = true;
 
       if (i>0)
       {
-          l0[i-1].geometry.vertices[0].x = points[i-1].x;
-          l0[i-1].geometry.vertices[0].y = points[i-1].y;
-          l0[i-1].geometry.vertices[0].z = points[i-1].z;
-          l0[i-1].geometry.vertices[1].x = points[i].x;
-          l0[i-1].geometry.vertices[1].y = points[i].y;
-          l0[i-1].geometry.vertices[1].z = points[i].z;
-          l0[i-1].geometry.verticesNeedUpdate = true;
+          lines[i-1].geometry.vertices[0].x = points[i-1].x;
+          lines[i-1].geometry.vertices[0].y = points[i-1].y;
+          lines[i-1].geometry.vertices[0].z = points[i-1].z;
+          lines[i-1].geometry.vertices[1].x = points[i].x;
+          lines[i-1].geometry.vertices[1].y = points[i].y;
+          lines[i-1].geometry.vertices[1].z = points[i].z;
+          lines[i-1].geometry.verticesNeedUpdate = true;
       }
     }
 
