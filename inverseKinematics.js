@@ -8,9 +8,9 @@ This file contains the implementation of FABRIK as well as a function for
 interpolating between goal/target points. The function is called moveTowards.
 *******************************************************************************/
 function distance(firstPoint, secondPoint) {
-  const xDif = Math.abs(secondPoint.x - firstPoint.x);
-  const yDif = Math.abs(secondPoint.y - firstPoint.y);
-  const zDif = Math.abs(secondPoint.z - firstPoint.z);
+  const xDif = secondPoint.x - firstPoint.x;
+  const yDif = secondPoint.y - firstPoint.y;
+  const zDif = secondPoint.z - firstPoint.z;
 
   const dist = Math.hypot(xDif, yDif, zDif);
 

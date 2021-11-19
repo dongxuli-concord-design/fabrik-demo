@@ -84,7 +84,7 @@ function displayPoints(scenePoints, lines, points)
 function testFabrik() {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.z = 10;
+  camera.position.z = 15;
   renderer = new THREE.WebGLRenderer(antialias = true);
   renderer.setSize(window.innerWidth, window.innerHeight);
 
@@ -94,7 +94,7 @@ function testFabrik() {
     renderer.render(scene, camera);
   }
 
-  const segments =[1, 1];
+  const segments =[0.5, 0.25, 0.25, 0.1];
   let points=mapPoints(segments);
   let scenePoints=createScenePoints(points);
   for (let i=0; i<scenePoints.length; i++)
