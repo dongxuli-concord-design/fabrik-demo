@@ -7,6 +7,10 @@ manipulation making projects with threejs and beyond.
 This file is a little test that depicts a simple two segment arm moving between
 two goal points.
 *******************************************************************************/
+
+  // segment lengths defined here
+  const segments =[1, 0.75, 0.5, 0.3,0.2, 0.1];
+
 function disableFrustCull(child)
 {
   child.traverse((childObj) => {
@@ -94,8 +98,6 @@ function testFabrik() {
     renderer.render(scene, camera);
   }
 
-  // segment lengths defined here
-  const segments =[1, 0.5, 0.25, 0.1];
   let points=mapPoints(segments);
   let scenePoints=createScenePoints(points);
   for (let i=0; i<scenePoints.length; i++)
@@ -114,15 +116,16 @@ function testFabrik() {
   animate();
 
   let iAngle=0;
-  let aSteps=40;
+  let aSteps=100;
 
       // points = fabrik(points, positionDown);
       // throw new Error("Here we stop");
 
   window.setInterval(function() {
 
+    // Goal position animation defined here
     a = (2.*Math.PI*iAngle)/aSteps;
-    const intermediateGoalPos = { x: 3+ 1.5*Math.cos(a), y: 2 + Math.sin(a), z: 1.};
+    const intermediateGoalPos = { x: 2+ Math.cos(a), y: 1.5 + 1.2*Math.sin(a), z: 1.};
 
     points = fabrik(points, intermediateGoalPos);
 
