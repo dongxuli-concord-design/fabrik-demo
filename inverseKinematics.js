@@ -61,82 +61,97 @@ function normalize(vector) {
   return normVec;
 }
 
+function plus(point0, point1)
+{
+  return {
+    x:point0.x+point1.x,
+    y:point0.y+point1.y,
+    z:point0.z+point1.z
+  };
+}
+
 // Part one
 function fabrik_finalToRoot(points, goalPos) {
   let currentGoal = goalPos;
+  let length=1;
 
-  for (let i = points.length - 1; i > 0; i -= 1) {
-    const length = distance(points[i - 1], points[i]);
+  for (let i = points.length - 1; i >= 0; i -= 1) {
+    if (i>0)
+      length = distance(points[i - 1], points[i]);
 
-    points[i] = {
-      x: currentGoal.x,
-      y: currentGoal.y,
-      z: currentGoal.z,
-    };
+    points[i] = currentGoal;
+    if (i>0)
+    {
 
-    const lineCurGoalToCurManip = {
-      x: points[i - 1].x - currentGoal.x,
-      y: points[i - 1].y - currentGoal.y,
-      z: points[i - 1].z - currentGoal.z,
-    }
+    const lineDirection = normalize(minus(points[i-1], currentGoal));
 
-    const lineDirection = normalize(lineCurGoalToCurManip);
+    const updatedLength = scaleBy(lineDirection, length);
 
-    const updatedLength = {
-      x: lineDirection.x * length,
-      y: lineDirection.y * length,
-      z: lineDirection.z * length,
-    };
+    currentGoal = plus(points[i], updatedLength);
 
-    currentGoal = {
-      x: currentGoal.x + updatedLength.x,
-      y: currentGoal.y + updatedLength.y,
-      z: currentGoal.z + updatedLength.z,
-    }
+    console.log("ToRoot: " + i);
+    console.log(distance(points[i], currentGoal));
+  }
   }
 
   return points;
+}
+
+function minus(pointEnd, pointStart)
+{
+  return {
+    x:pointEnd.x - pointStart.x,
+    y:pointEnd.y - pointStart.y,
+    z:pointEnd.z - pointStart.z
+  };
+}
+
+function scaleBy(vector, scale)
+{
+    return {
+      x:vector.x * scale,
+      y:vector.y * scale,
+      z:vector.z * scale
+    };
 }
 
 // Part two
-function fabrik_rootToFinal(points, goalPos, length) {
-  let base = points[0];
+function fabrik_rootToFinal(points, goalPos) {
+  let currentGoal = goalPos;
+  let length=1;
 
-  for(let i = 0; i < points.length - 1; i += 1) {
-    const lineCurGoalToCurPt = {
-      x: points[i + 1].x - points[i].x,
-      y: points[i + 1].y - points[i].y,
-      z: points[i + 1].z - points[i].z,
-    }
+  for(let i = 0; i < points.length; i += 1) {
+    if (i < points.length - 1)
+      length = distance(points[i], points[i+1]);
 
-    const lineDirection = normalize(lineCurGoalToCurPt);
+    points[i] = currentGoal;
+    if (i<points.length)
+    {
 
-    const updatedLength = {
-      x: lineDirection.x * length,
-      y: lineDirection.y * length,
-      z: lineDirection.z * length,
-    };
+    console.log(i, points.length);
+    const lineDirection = normalize(minus(points[i+1], points[i]));
+
+    const updatedLength = scaleBy(lineDirection, length);
 
     // This is where constraint adjustment would happen.
     // Adjust the point before assigning it
-    points[i + 1] = {
-      x: points[i].x + updatedLength.x,
-      y: points[i].y + updatedLength.y,
-      z: points[i].z + updatedLength.z,
-    }
+    currentGoal = plus(points[i], updatedLength);
+    console.log("ToFinal: " + i);
+    console.log(distance(points[i], currentGoal));
+  }
   }
 
   return points;
 }
 
-function fabrik(points, goalPos, length = 3, epsilon = 0.05) {
+function fabrik(points, goalPos, epsilon = 2e-3) {
   const { isReachable, maxReach } = targetReachable(points, goalPos)
   if (isReachable) {
     let endEffectorPos = points[points.length - 1];
-
+    let basePos=points[0];
     while(needToMove(endEffectorPos, goalPos, epsilon)) {
       points = fabrik_finalToRoot(points, goalPos); // Part one
-      points = fabrik_rootToFinal(points, goalPos, length); // Part two
+      points = fabrik_rootToFinal(points, basePos); // Part two
 
       endEffectorPos = points[points.length - 1];
     }

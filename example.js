@@ -94,6 +94,7 @@ function testFabrik() {
     renderer.render(scene, camera);
   }
 
+  // segment lengths defined here
   const segments =[1, 0.5, 0.25, 0.1];
   let points=mapPoints(segments);
   let scenePoints=createScenePoints(points);
@@ -101,8 +102,6 @@ function testFabrik() {
   {
     scene.add(scenePoints[i]);
   }
-
-  console.log(points[0].x, points[0].y, points[0].z, points[1].x, points[1].y, points[1].z);
 
   const lines = createLines(points);
   for (let i=0; i<lines.length; i++)
@@ -114,30 +113,18 @@ function testFabrik() {
 
   animate();
 
-  let xVal = 0;
-  let yVal = 2;
-  let zVal = 0;
-
-  const moveSpeed = 0.01;
-
-
-  const positionUp = { x: 0, y: 2, z: 0 };
-  const positionDown = { x: 0.2, y: 0.75, z: 0 };
-
-  const goalPositions = [
-    positionUp,
-    positionDown
-  ];
-
   let iAngle=0;
-  let aSteps=200;
+  let aSteps=40;
+
+      // points = fabrik(points, positionDown);
+      // throw new Error("Here we stop");
 
   window.setInterval(function() {
 
     a = (2.*Math.PI*iAngle)/aSteps;
     const intermediateGoalPos = { x: 3+ 1.5*Math.cos(a), y: 2 + Math.sin(a), z: 1.};
 
-    points = fabrik(points, intermediateGoalPos, points.length);
+    points = fabrik(points, intermediateGoalPos);
 
     displayPoints(scenePoints, lines, points);
 
