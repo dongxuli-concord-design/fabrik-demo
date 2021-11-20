@@ -94,7 +94,7 @@ function testFabrik() {
     renderer.render(scene, camera);
   }
 
-  const segments =[0.5, 0.25, 0.25, 0.1];
+  const segments =[1, 0.5, 0.25, 0.1];
   let points=mapPoints(segments);
   let scenePoints=createScenePoints(points);
   for (let i=0; i<scenePoints.length; i++)
@@ -129,27 +129,19 @@ function testFabrik() {
     positionDown
   ];
 
-  let currentPosition = 0;
+  let iAngle=0;
+  let aSteps=200;
 
   window.setInterval(function() {
-    const goalPos = goalPositions[currentPosition];
 
-    const xMove = moveTowards(xVal, goalPos.x, moveSpeed);
-    xVal = xMove.newVal;
-    const yMove = moveTowards(yVal, goalPos.y, moveSpeed);
-    yVal = yMove.newVal;
-    const zMove = moveTowards(zVal, goalPos.z, moveSpeed);
-    zVal = zMove.newVal;
-
-    const intermediateGoalPos = { x: xVal, y: yVal, z: zVal };
+    a = (2.*Math.PI*iAngle)/aSteps;
+    const intermediateGoalPos = { x: 3+ 1.5*Math.cos(a), y: 2 + Math.sin(a), z: 1.};
 
     points = fabrik(points, intermediateGoalPos, points.length);
 
     displayPoints(scenePoints, lines, points);
 
-    if (xMove.reached && yMove.reached && zMove.reached) {
-      currentPosition = (currentPosition + 1) % 2;
-    }
+    iAngle=(iAngle+1)%aSteps;
 
   }, 10);
 }
