@@ -8,13 +8,7 @@ This file contains the implementation of FABRIK as well as a function for
 interpolating between goal/target points. The function is called moveTowards.
 *******************************************************************************/
 function distance(firstPoint, secondPoint) {
-  const xDif = secondPoint.x - firstPoint.x;
-  const yDif = secondPoint.y - firstPoint.y;
-  const zDif = secondPoint.z - firstPoint.z;
-
-  const dist = Math.hypot(xDif, yDif, zDif);
-
-  return dist;
+  return findMagnitude(minus(firstPoint, secondPoint));
 }
 
 function needToMove(endEffectorPos, goalPos, epsilon) {
@@ -52,13 +46,7 @@ function normalize(vector) {
   if (mag == 0)
   	return {x:0, y:0, z:0};
 
-  const normX = vector.x / mag;
-  const normY = vector.y / mag;
-  const normZ = vector.z / mag;
-
-  const normVec = { x: normX, y: normY, z: normZ };
-
-  return normVec;
+  return scaleBy(vector, 1./mag);
 }
 
 function plus(point0, point1)
@@ -88,9 +76,6 @@ function fabrik_finalToRoot(points, goalPos) {
     const updatedLength = scaleBy(lineDirection, length);
 
     currentGoal = plus(points[i], updatedLength);
-
-    console.log("ToRoot: " + i);
-    console.log(distance(points[i], currentGoal));
   }
   }
 
@@ -128,7 +113,6 @@ function fabrik_rootToFinal(points, goalPos) {
     if (i<points.length)
     {
 
-    console.log(i, points.length);
     const lineDirection = normalize(minus(points[i+1], points[i]));
 
     const updatedLength = scaleBy(lineDirection, length);
@@ -136,8 +120,6 @@ function fabrik_rootToFinal(points, goalPos) {
     // This is where constraint adjustment would happen.
     // Adjust the point before assigning it
     currentGoal = plus(points[i], updatedLength);
-    console.log("ToFinal: " + i);
-    console.log(distance(points[i], currentGoal));
   }
   }
 
@@ -158,11 +140,7 @@ function fabrik(points, goalPos, epsilon = 2e-3) {
   } else {
     const direction = normalize(goalPos);
     // reach until max in direction of goal
-    const reachGoalX = direction.x * (maxReach * 0.99);
-    const reachGoalY = direction.y * (maxReach * 0.99);
-    const reachGoalZ = direction.z * (maxReach * 0.99);
-
-    reachGoalPos = { x: reachGoalX, y: reachGoalY, z: reachGoalZ };
+    reachGoalPos=scaleBy(direction, maxReach * 0.99);
 
     return fabrik(points, reachGoalPos);
   }
