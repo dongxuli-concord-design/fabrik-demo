@@ -58,37 +58,9 @@ function plus(point0, point1)
   };
 }
 
-// Part one
-function fabrik_finalToRoot(points, goalPos) {
-  let currentGoal = goalPos;
-  let length=1;
-
-  for (let i = points.length - 1; i >= 0; i -= 1) {
-    if (i>0)
-      length = distance(points[i - 1], points[i]);
-
-    points[i] = currentGoal;
-    if (i>0)
-    {
-
-    const lineDirection = normalize(minus(points[i-1], currentGoal));
-
-    const updatedLength = scaleBy(lineDirection, length);
-
-    currentGoal = plus(points[i], updatedLength);
-  }
-  }
-
-  return points;
-}
-
 function minus(pointEnd, pointStart)
 {
-  return {
-    x:pointEnd.x - pointStart.x,
-    y:pointEnd.y - pointStart.y,
-    z:pointEnd.z - pointStart.z
-  };
+  return plus(pointEnd, scaleBy(pointStart, -1.));
 }
 
 function scaleBy(vector, scale)
@@ -100,30 +72,46 @@ function scaleBy(vector, scale)
     };
 }
 
+function fabrik_single(points, goalPos, step)
+{
+  let currentGoal=goalPos;
+  let first=0;
+  let last = points.length - 1;
+  if (step == -1)
+  {
+    first = last;
+    last = 0;
+  }
+  const passLast = last + step;
+
+    for (let i = first; i != passLast; i += step)
+     {
+      if (i!=last)
+        length = distance(points[i + step], points[i]);
+
+      points[i] = currentGoal;
+
+      if (i==last)
+        break;
+
+      const lineDirection = normalize(minus(points[i+step], currentGoal));
+
+      const updatedLength = scaleBy(lineDirection, length);
+
+      currentGoal = plus(points[i], updatedLength);
+      }
+
+    return points;
+}
+
+// Part one
+function fabrik_finalToRoot(points, goalPos) {
+  return fabrik_single(points, goalPos, -1);
+}
+
 // Part two
 function fabrik_rootToFinal(points, goalPos) {
-  let currentGoal = goalPos;
-  let length=1;
-
-  for(let i = 0; i < points.length; i += 1) {
-    if (i < points.length - 1)
-      length = distance(points[i], points[i+1]);
-
-    points[i] = currentGoal;
-    if (i<points.length)
-    {
-
-    const lineDirection = normalize(minus(points[i+1], points[i]));
-
-    const updatedLength = scaleBy(lineDirection, length);
-
-    // This is where constraint adjustment would happen.
-    // Adjust the point before assigning it
-    currentGoal = plus(points[i], updatedLength);
-  }
-  }
-
-  return points;
+  return fabrik_single(points, goalPos, 1);
 }
 
 function fabrik(points, goalPos, epsilon = 2e-3) {
