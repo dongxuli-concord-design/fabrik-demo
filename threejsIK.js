@@ -6,35 +6,35 @@ manipulation making projects with threejs and beyond.
 
 This file contains simple but useful functions for creating elements in threejs.
 *******************************************************************************/
-function createPoint({ x, y, z , size }) {
-  const pointGeometry = new THREE.Geometry();
-  pointGeometry.vertices.push(new THREE.Vector3(x, y, z));
+function createPoint({ x, y, z, size }) {
+    const pointGeometry = new THREE.Geometry();
+    pointGeometry.vertices.push(new THREE.Vector3(x, y, z));
 
-  const pointMaterial = new THREE.PointsMaterial({ size, sizeAttenuation: false });
+    const pointMaterial = new THREE.PointsMaterial({ size, sizeAttenuation: false });
 
-  const point = new THREE.Points(pointGeometry, pointMaterial);
+    const point = new THREE.Points(pointGeometry, pointMaterial);
 
-  return point;
+    return point;
 }
 
 function createLine({ x0, y0, z0, x1, y1, z1 }) {
-  console.log(x0, y0, z0, x1, y1, z1);
-  const lineGeometry = new THREE.Geometry();
-  lineGeometry.vertices.push(new THREE.Vector3(x0, y0, z0)); // TODO: switch to a BufferGeometry for performance
-  lineGeometry.vertices.push(new THREE.Vector3(x1, y1, z1));
+    console.log(x0, y0, z0, x1, y1, z1);
+    const lineGeometry = new THREE.Geometry();
+    lineGeometry.vertices.push(new THREE.Vector3(x0, y0, z0)); // TODO: switch to a BufferGeometry for performance
+    lineGeometry.vertices.push(new THREE.Vector3(x1, y1, z1));
 
-  const lineMaterial = new THREE.LineBasicMaterial({ color: 0x777777 });
+    const lineMaterial = new THREE.LineBasicMaterial({ color: 0x777777 });
 
-  const line = new THREE.Line(lineGeometry, lineMaterial);
+    const line = new THREE.Line(lineGeometry, lineMaterial);
 
-  return line;
+    return line;
 }
 
 function createPlane({ width, height, widthSegments, heightSegments }) {
-  const planeGeometry = new THREE.PlaneGeometry(width, height, widthSegments, heightSegments);
-  planeMaterial = new THREE.MeshBasicMaterial({ color: (Math.random() * 0xffffff), side: THREE.DoubleSide });
-  
-  const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+    const planeGeometry = new THREE.PlaneGeometry(width, height, widthSegments, heightSegments);
+    planeMaterial = new THREE.MeshBasicMaterial({ color: (Math.random() * 0xffffff), side: THREE.DoubleSide });
 
-  return plane;
+    const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+
+    return plane;
 }

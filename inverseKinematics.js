@@ -8,155 +8,168 @@ This file contains the implementation of FABRIK as well as a function for
 interpolating between goal/target points. The function is called moveTowards.
 *******************************************************************************/
 function distance(firstPoint, secondPoint) {
-  return findMagnitude(minus(firstPoint, secondPoint));
+    return findMagnitude(minus(firstPoint, secondPoint));
 }
 
 function needToMove(endEffectorPos, goalPos, epsilon) {
-  const distFromGoal = distance(endEffectorPos, goalPos);
+    const distFromGoal = distance(endEffectorPos, goalPos);
 
-  return (distFromGoal > epsilon);
+    return (distFromGoal > epsilon);
 }
 
 function targetReachable(points, goalPos) {
-  const basePoint = points[0];
-  let maxReach = 0;
+    const basePoint = points[0];
+    let maxReach = 0;
 
-  let lastPoint = basePoint;
-  points.forEach((point) => {
-    maxReach += distance(lastPoint, point);
-    lastPoint = point;
-  });
+    let lastPoint = basePoint;
+    points.forEach((point) => {
+        maxReach += distance(lastPoint, point);
+        lastPoint = point;
+    });
 
-  const distFromGoal = distance(basePoint, goalPos);
+    const distFromGoal = distance(basePoint, goalPos);
 
-  const isReachable = distFromGoal <= maxReach;
+    const isReachable = distFromGoal <= maxReach;
 
-  return { isReachable, maxReach };
+    return { isReachable, maxReach };
 }
 
 function findMagnitude(vector) {
 
-  const mag = Math.hypot(vector.x, vector.y, vector.z);
+    const mag = Math.hypot(vector.x, vector.y, vector.z);
 
-  return mag;
+    return mag;
 }
 
 function normalize(vector) {
-  const mag = findMagnitude(vector);
-  if (mag == 0)
-  	return {x:0, y:0, z:0};
+    const mag = findMagnitude(vector);
+    if (mag == 0)
+        return {x:0, y:0, z:0};
 
-  return scaleBy(vector, 1./mag);
+    return scaleBy(vector, 1./mag);
 }
 
 function plus(point0, point1)
 {
-  return {
-    x:point0.x+point1.x,
-    y:point0.y+point1.y,
-    z:point0.z+point1.z
-  };
+    return {
+x:
+        point0.x+point1.x,
+y:
+        point0.y+point1.y,
+z:
+        point0.z+point1.z
+    };
 }
 
 function minus(pointEnd, pointStart)
 {
-  return plus(pointEnd, scaleBy(pointStart, -1.));
+    return plus(pointEnd, scaleBy(pointStart, -1.));
 }
 
 function scaleBy(vector, scale)
 {
     return {
-      x:vector.x * scale,
-      y:vector.y * scale,
-      z:vector.z * scale
+x:
+        vector.x * scale,
+y:
+        vector.y * scale,
+z:
+        vector.z * scale
     };
 }
 
 function fabrik_single(points, goalPos, step)
 {
-  let currentGoal=goalPos;
-  let first=0;
-  let last = points.length - 1;
-  if (step == -1)
-  {
-    first = last;
-    last = 0;
-  }
-  const passLast = last + step;
+    let currentGoal=goalPos;
+    let first=0;
+    let last = points.length - 1;
+    if (step == -1)
+    {
+        first = last;
+        last = 0;
+    }
+    const passLast = last + step;
 
     for (let i = first; i != passLast; i += step)
-     {
-      if (i!=last)
-        length = distance(points[i + step], points[i]);
+    {
+        if (i!=last)
+            length = distance(points[i + step], points[i]);
 
-      points[i] = currentGoal;
+        points[i] = currentGoal;
 
-      if (i==last)
-        break;
+        if (i==last)
+            break;
 
-      const lineDirection = normalize(minus(points[i+step], currentGoal));
+        const lineDirection = normalize(minus(points[i+step], currentGoal));
 
-      const updatedLength = scaleBy(lineDirection, length);
+        const updatedLength = scaleBy(lineDirection, length);
 
-      currentGoal = plus(points[i], updatedLength);
-      }
+        currentGoal = plus(points[i], updatedLength);
+    }
 
     return points;
 }
 
 // Part one
 function fabrik_finalToRoot(points, goalPos) {
-  return fabrik_single(points, goalPos, -1);
+    return fabrik_single(points, goalPos, -1);
 }
 
 // Part two
 function fabrik_rootToFinal(points, goalPos) {
-  return fabrik_single(points, goalPos, 1);
+    return fabrik_single(points, goalPos, 1);
 }
 
 function fabrik(points, goalPos, epsilon = 2e-3) {
-  const { isReachable, maxReach } = targetReachable(points, goalPos)
-  if (isReachable) {
-    let endEffectorPos = points[points.length - 1];
-    let basePos=points[0];
-    while(needToMove(endEffectorPos, goalPos, epsilon)) {
-      points = fabrik_finalToRoot(points, goalPos); // Part one
-      points = fabrik_rootToFinal(points, basePos); // Part two
+    const { isReachable, maxReach } = targetReachable(points, goalPos)
+    if (isReachable) {
+        let endEffectorPos = points[points.length - 1];
+        let basePos=points[0];
+        while(needToMove(endEffectorPos, goalPos, epsilon)) {
+            points = fabrik_finalToRoot(points, goalPos); // Part one
+            points = fabrik_rootToFinal(points, basePos); // Part two
 
-      endEffectorPos = points[points.length - 1];
+            endEffectorPos = points[points.length - 1];
+        }
+    } else {
+        const direction = normalize(minus(goalPos, points[0]));
+        // reach until max in direction of goal
+
+        let lastPoint = points[0];
+        let savedPoint = lastPoint;
+        for(let i=0; i<points.length; i++)
+        {
+            const segment = distance(points[i], savedPoint);
+            savedPoint=points[i];
+            lastPoint = plus(lastPoint, scaleBy(direction, segment));
+            points[i] = lastPoint
+        }
     }
-  } else {
-    const direction = normalize(goalPos);
-    // reach until max in direction of goal
-    reachGoalPos=scaleBy(direction, maxReach * 0.99);
 
-    return fabrik(points, reachGoalPos);
-  }
-
-  return points;
+    return points;
 }
 
 // For interpolating between two points.
 function moveTowards(currentVal, goalVal, moveSpeed) {
-  let newVal = currentVal;
-  if (currentVal < goalVal) {
-    const distLeft = goalVal - currentVal
-    if (distLeft < moveSpeed) {
-      newVal = currentVal + distLeft;
-    } else {
-      newVal = currentVal + moveSpeed;
+    let newVal = currentVal;
+    if (currentVal < goalVal) {
+        const distLeft = goalVal - currentVal
+        if (distLeft < moveSpeed) {
+            newVal = currentVal + distLeft;
+        } else {
+            newVal = currentVal + moveSpeed;
+        }
     }
-  }
-  if (currentVal > goalVal) {
-    const distLeft = currentVal - goalVal
-    if (distLeft < moveSpeed) {
-      newVal = currentVal - distLeft;
-    } else {
-      newVal = currentVal - moveSpeed;
+    if (currentVal > goalVal) {
+        const distLeft = currentVal - goalVal
+        if (distLeft < moveSpeed) {
+            newVal = currentVal - distLeft;
+        } else {
+            newVal = currentVal - moveSpeed;
+        }
     }
-  }
-  if (currentVal == goalVal) {
-    return { reached: true, newVal };
-  }
-  return { reached: false, newVal };
+    if (currentVal == goalVal) {
+        return { reached: true, newVal };
+    }
+    return { reached: false, newVal };
 }
